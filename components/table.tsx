@@ -1,6 +1,5 @@
 import { sql } from '@vercel/postgres'
 import { timeAgo } from '@/lib/utils'
-import Image from 'next/image'
 import RefreshButton from './refresh-button'
 import { seed } from '@/lib/seed'
 
@@ -45,8 +44,8 @@ export default async function Table() {
             className="flex items-center justify-between py-3"
           >
             <div className="flex items-center space-x-4">
-              <Image
-                src={user.image}
+              <img
+                src={user.image ? user.image : "https://www.datocms-assets.com/86369/1679602004-covalent-staff-member.jpg"}
                 alt={user.name}
                 width={48}
                 height={48}
