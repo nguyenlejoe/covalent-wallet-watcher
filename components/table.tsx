@@ -32,13 +32,13 @@ export default async function Table() {
         <div className="space-y-1">
           <h2 className="text-xl font-semibold">Recent Users</h2>
           <p className="text-sm text-gray-500">
-            Fetched {users.length} users in {duration}ms
+            Fetched {users && users.length} users in {duration}ms
           </p>
         </div>
         <RefreshButton />
       </div>
       <div className="divide-y divide-gray-900/5">
-        {users.map((user) => (
+        {users && users.map((user) => (
           <div
             key={user.name}
             className="flex items-center justify-between py-3"
