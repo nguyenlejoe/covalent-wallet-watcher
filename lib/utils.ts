@@ -1,4 +1,5 @@
 import ms from 'ms'
+import { cookies } from 'next/headers';
 
 export const timeAgo = (timestamp: Date, timeOnly?: boolean): string => {
   if (!timestamp) return 'never'
@@ -30,3 +31,6 @@ export const cookie_remove = (name: string) => {
   cookie_write(name, "", -1);
 };
 
+export const isProduction = process.env.NODE_ENV === "production";
+
+export const API_BASE_URL = isProduction ? "https://covalent-wallet-watcher.vercel.app" : "http://localhost:3000";

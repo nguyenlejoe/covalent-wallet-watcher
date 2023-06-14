@@ -1,10 +1,11 @@
-import { Suspense} from 'react'
-import Form from './form';
-import Table from './table';
-import TablePlaceholder from './table-placeholder';
-import { API_BASE_URL, cookie_read } from '@/lib/utils';
-import { cookies, headers } from 'next/headers'
+import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { Suspense} from 'react'
+import Table from '../../components/table';
+import TablePlaceholder from '../../components/table-placeholder';
+import { headers } from 'next/headers';
+import { API_BASE_URL } from '@/lib/utils';
+
 
 const handleAuth = async () => {
     const cookieStore = cookies()
@@ -24,17 +25,22 @@ const handleAuth = async () => {
         const result = await resp.json();    
 
         if(result.error){
-            return false;
+            redirect('/')
         }
-        redirect('/dashboard');
 
+        return true;
+
+    }else{
+        redirect('/')
     }
         
 };
 
-export default async function Auth() {
+export default async function Dashboard () {
     await handleAuth();
-
-    return <Form/>
-
+    
+    return <Suspense fallback={<TablePlaceholder />}>
+    {/* @ts-expect-error Async Server Component */}
+    <Table />
+</Suspense>
 }

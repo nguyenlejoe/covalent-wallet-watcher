@@ -3,7 +3,7 @@ import { timeAgo } from '@/lib/utils'
 import RefreshButton from './refresh-button'
 import { seed } from '@/lib/seed'
 
-export default async function Table() {
+async function getData () {
   let data
   let startTime = Date.now()
 
@@ -25,6 +25,11 @@ export default async function Table() {
 
   const { rows: users } = data
   const duration = Date.now() - startTime
+  return users
+}
+
+export default async function Table() {
+  const users:any = await getData();
 
   return (
     <div className="bg-white/30 p-12 shadow-xl ring-1 ring-gray-900/5 rounded-lg backdrop-blur-lg max-w-xl mx-auto w-full">
@@ -38,7 +43,7 @@ export default async function Table() {
         <RefreshButton />
       </div>
       <div className="divide-y divide-gray-900/5">
-        {users && users.map((user) => (
+        {users && users.map((user: any) => (
           <div
             key={user.name}
             className="flex items-center justify-between py-3"

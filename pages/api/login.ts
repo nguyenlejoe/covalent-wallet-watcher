@@ -12,7 +12,7 @@ export default async function login(req:NextApiRequest, res:NextApiResponse) {
       const token = jwt.sign({
         isLogged: true
       }, "shh")
-      res.setHeader('Set-Cookie', 'your-auth-cookie=token; HttpOnly; Path=/');
+      res.setHeader('Set-Cookie', `wallet_token=${token}; HttpOnly; Path=/`);
       return res.status(200).json({ 
           error: false,
           message: "Successfully logged in.",
@@ -25,3 +25,4 @@ export default async function login(req:NextApiRequest, res:NextApiResponse) {
      });
     }
 }
+
