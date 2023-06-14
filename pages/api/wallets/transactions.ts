@@ -8,7 +8,7 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
     }
 
     const wallets = await GetWallets();
-    let transactions: any = ["2023-08-25T08:13:35Z"];
+    let transactions: any = [];
     let headers = new Headers();
     headers.set('Authorization', `Bearer ${process.env.API_KEY}`)
 
