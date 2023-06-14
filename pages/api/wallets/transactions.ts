@@ -1,27 +1,65 @@
+import { CreateTransaction, EditTransaction, GetLatestTransaction, GetWallets } from '@/lib/wallet';
 import { NextApiRequest, NextApiResponse } from 'next';
 const jwt = require('jsonwebtoken');
  
 export default async function transactions(req:NextApiRequest, res:NextApiResponse) {
-    if (req.method !== 'POST') {
+    if (req.method !== 'GET') {
       return res.status(405).json({ message: 'Method Not Allowed' });
     }
 
-    const { address } = req.body;
-
+    const wallets = await GetWallets();
+    let transactions: any = ["2023-08-25T08:13:35Z"];
     let headers = new Headers();
     headers.set('Authorization', `Bearer ${process.env.API_KEY}`)
 
-    const resp:any = await fetch(`https://api.covalenthq.com/v1/eth-mainnet/address/${address}/transactions_summary/`, {
-        method: "GET",
-        headers: headers
-      })
+    const results = await Promise.all(wallets.wallets.rows?.map((o,i) => {
+        return fetch(`https://api.covalenthq.com/v1/eth-mainnet/address/${o.address}/transactions_summary/`, {
+            method: "GET",
+            headers: headers
+          })
+    }))
     
-    const result = await resp.json();
+    for(const i of results){
+        const resp = await i.json();
+        const latest = resp.data.items[0].latest_transaction.block_signed_at
+        transactions = [...transactions, latest]
+    }
+
+    const recent = new Date(Math.max(...transactions.map((e: string | number | Date) => new Date(e))));
+    const db = await GetLatestTransaction();
+    const db_recent = new Date(db.latest_transaction.rows[0].created_at);
+
+    if(db.latest_transaction.rows.length === 0){
+        await CreateTransaction(recent);
+        return res.status(200).json({ 
+            error: false,
+            message: "First run",
+            data: transactions
+        });
+    }
+
+    if(db_recent >= recent){
+        return res.status(200).json({ 
+            error: false,
+            message: "No Change",
+            data: recent
+        });
+    }
+
+    if(db_recent < recent){
+        await EditTransaction(recent);
+        // notify email
+        return res.status(200).json({ 
+            error: false,
+            message: "Change",
+            data: recent
+        });
+    }
 
     return res.status(200).json({ 
         error: false,
-        message: "Successfully logged in.",
-        data: result
+        message: "Successful",
+        data: recent
     });
 
 }
