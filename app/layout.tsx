@@ -21,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.variable}>
-        <div className='relative flex min-h-screen flex-col items-center justify-center w-screen'>
+        <div className='relative min-h-screen w-screen'>
           {children}
         </div>
         </body>

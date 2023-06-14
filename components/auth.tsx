@@ -1,7 +1,4 @@
-import { Suspense} from 'react'
 import Form from './form';
-import Table from './table';
-import TablePlaceholder from './table-placeholder';
 import { API_BASE_URL, cookie_read } from '@/lib/utils';
 import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
@@ -35,6 +32,6 @@ const handleAuth = async () => {
 export default async function Auth() {
     await handleAuth();
 
-    return <Form/>
+    return <div className='flex h-screen justify-center items-center'><Form/></div>
 
 }
