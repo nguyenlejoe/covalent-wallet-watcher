@@ -27,7 +27,6 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
 
     const recent = new Date(Math.max(...transactions.map((e: string | number | Date) => new Date(e))));
     const db = await GetLatestTransaction();
-    const db_recent = new Date(db.latest_transaction.rows[0].created_at);
 
     if(db.latest_transaction.rows.length === 0){
         await CreateTransaction(recent);
@@ -37,6 +36,7 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
             data: transactions
         });
     }
+    const db_recent = new Date(db.latest_transaction.rows[0].created_at);
 
     if(db_recent >= recent){
         return res.status(200).json({ 
