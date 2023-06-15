@@ -37,10 +37,15 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
         return res.status(401).json({ 
             error: true,
             message: "Failed to collect data",
-         });
+        });
     }
 
-
+    if(results.length <= 0){
+        return res.status(401).json({ 
+            error: true,
+            message: "No transactions",
+        });
+    }
     
     for(const i of results){
         const resp = await i.json();
@@ -48,8 +53,22 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
         transactions = [...transactions, latest]
     }
 
+    if(!transactions || transactions.length === 0){
+        return res.status(401).json({ 
+            error: true,
+            message: "No transactions",
+        });
+    }
+
     const recent = new Date(Math.max(...transactions.map((e: string | number | Date) => new Date(e))));
     const db = await GetLatestTransaction();
+
+    if(!recent || !db){
+        return res.status(401).json({ 
+            error: true,
+            message: "No recent",
+        });
+    }
 
     if(db.latest_transaction.rows.length === 0){
         await CreateTransaction(recent);
@@ -73,7 +92,7 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
     if(db_recent < recent){
         await EditTransaction(recent);
         try {
-            await handleTelegramMessage();
+            // await handleTelegramMessage();
             return res.status(200).json({ 
                 error: false,
                 message: "Change",
