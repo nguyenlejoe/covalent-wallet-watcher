@@ -1,6 +1,19 @@
 import { CreateTransaction, EditTransaction, GetLatestTransaction, GetWallets } from '@/lib/wallet';
 import { NextApiRequest, NextApiResponse } from 'next';
 const jwt = require('jsonwebtoken');
+
+const handleTelegramMessage = async () => {
+    await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_ID}/sendMessage`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            chat_id: process.env.TELEGRAM_CHAT_ID,
+            text: "There has been a new transaction! Please visit your wallet application for more details"
+        }), 
+    })
+}
  
 export default async function transactions(req:NextApiRequest, res:NextApiResponse) {
     if (req.method !== 'GET') {
@@ -45,10 +58,11 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
             data: recent
         });
     }
+    
 
     if(db_recent < recent){
         await EditTransaction(recent);
-        // notify email
+        await handleTelegramMessage();
         return res.status(200).json({ 
             error: false,
             message: "Change",
