@@ -1,6 +1,5 @@
 import { CreateTransaction, EditTransaction, GetLatestTransaction, GetWallets } from '@/lib/wallet';
 import { NextApiRequest, NextApiResponse } from 'next';
-const jwt = require('jsonwebtoken');
 
 const handleTelegramMessage = async () => {
     await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_ID}/sendMessage`, {
@@ -19,6 +18,7 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
     if (req.method !== 'GET') {
       return res.status(405).json({ message: 'Method Not Allowed' });
     }
+    
 
     const wallets = await GetWallets();
     let transactions: any = [];
@@ -31,6 +31,7 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
             headers: headers
           })
     }))
+
     
     for(const i of results){
         const resp = await i.json();
@@ -69,12 +70,6 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
             data: recent
         });
     }
-
-    return res.status(200).json({ 
-        error: false,
-        message: "Successful",
-        data: recent
-    });
 
 }
 
