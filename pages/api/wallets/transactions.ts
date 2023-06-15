@@ -9,7 +9,8 @@ const handleTelegramMessage = async () => {
         },
         body: JSON.stringify({
             chat_id: process.env.TELEGRAM_CHAT_ID,
-            text: "There has been a new transaction! Please visit your wallet application for more details"
+            text: "There has been a new transaction! Please visit your wallet application for more details",
+            parse_mode: "HTML"
         }), 
     })
 }
@@ -38,7 +39,7 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
         return fetch(`https://api.covalenthq.com/v1/eth-mainnet/address/${o.address}/transactions_summary/`, {
             method: "GET",
             headers: headers
-            })
+        })
     }))
     
 

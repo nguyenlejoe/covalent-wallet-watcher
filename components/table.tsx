@@ -2,68 +2,47 @@ import { sql } from '@vercel/postgres'
 import { timeAgo } from '@/lib/utils'
 import RefreshButton from './refresh-button'
 import { seed } from '@/lib/seed'
+import { GetWallets } from '@/lib/wallet';
+import DataTable from './data-table';
 
 async function getData () {
-  let data
-  let startTime = Date.now()
+  const wallets = await GetWallets();
+  let transactions: any[] = [];
+  let headers = new Headers();
 
-  try {
-    data = await sql`SELECT * FROM users`
-  } catch (e: any) {
-    if (e.message === `relation "users" does not exist`) {
-      console.log(
-        'Table does not exist, creating and seeding it with dummy data now...'
-      )
-      // Table is not created yet
-      await seed()
-      startTime = Date.now()
-      data = await sql`SELECT * FROM users`
-    } else {
-      throw e
-    }
+  headers.set('Authorization', `Bearer ${process.env.API_KEY}`)
+
+  const results = await Promise.all(wallets.wallets.rows?.map((o,i) => {
+    return fetch(`https://api.covalenthq.com/v1/eth-mainnet/address/${o.address}/transactions_v3/`, {
+        method: "GET",
+        headers: headers
+    })
+    .then(resp => resp.json())
+    .then(data => data.data.items);
+  }));
+
+  for(const i of await results){
+    transactions = [...transactions, ...i]
   }
-
-  const { rows: users } = data
-  const duration = Date.now() - startTime
-  return users
+  return transactions.map((o, i) => {
+      return { id: i, col1: new Date(o.block_signed_at).toLocaleDateString("en-US"), col2: o.from_address, col3: o.to_address , col4: o.pretty_value_quote }
+  })
 }
 
 export default async function Table() {
-  const users:any = await getData();
-
+  const data:any = await getData();
   return (
     <div className="p-12 rounded-lg backdrop-blur-lg   w-full">
       <div className="flex justify-between items-center mb-4">
         <div className="space-y-1">
-          <h2 className="text-xl font-semibold">Recent Users</h2>
+          <h2 className="text-xl font-semibold">Recent Transactions</h2>
           <p className="text-sm text-gray-500">
-            {/* Fetched {users && users.length} users in {duration}ms */}
           </p>
         </div>
         <RefreshButton />
       </div>
-      <div className="divide-y divide-gray-900/5">
-        {users && users.map((user: any) => (
-          <div
-            key={user.name}
-            className="flex items-center justify-between py-3"
-          >
-            <div className="flex items-center space-x-4">
-              <img
-                src={user.image ? user.image : "https://www.datocms-assets.com/86369/1679602004-covalent-staff-member.jpg"}
-                alt={user.name}
-                width={48}
-                height={48}
-                className="rounded-full ring-1 ring-gray-900/5"
-              />
-              <div className="space-y-1">
-                <p className="font-medium leading-none">{user.name}</p>
-                <p className="text-sm text-gray-500">{user.email}</p>
-              </div>
-            </div>
-            <p className="text-sm text-gray-500">{timeAgo(user.createdAt)}</p>
-          </div>
-        ))}
+      <div className="divide-y divide-gray-900/5 flex flex-col">
+        <DataTable rows={data}/>
       </div>
     </div>
   )

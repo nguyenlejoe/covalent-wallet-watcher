@@ -4,7 +4,7 @@
   "crons": [
     {
       "path": "/api/wallets/transactions",
-      "schedule": "* * * * *"
+      "schedule": "*/5 * * * *"
     }
   ]
 }
