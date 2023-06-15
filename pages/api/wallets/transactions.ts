@@ -21,16 +21,25 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
     
 
     const wallets = await GetWallets();
+    let results: Response[] = []
     let transactions: any = [];
     let headers = new Headers();
     headers.set('Authorization', `Bearer ${process.env.API_KEY}`)
 
-    const results = await Promise.all(wallets.wallets.rows?.map((o,i) => {
-        return fetch(`https://api.covalenthq.com/v1/eth-mainnet/address/${o.address}/transactions_summary/`, {
-            method: "GET",
-            headers: headers
-          })
-    }))
+    try {
+        results = await Promise.all(wallets.wallets.rows?.map((o,i) => {
+            return fetch(`https://api.covalenthq.com/v1/eth-mainnet/address/${o.address}/transactions_summary/`, {
+                method: "GET",
+                headers: headers
+              })
+        }))
+    } catch (error) {
+        return res.status(401).json({ 
+            error: true,
+            message: "Failed to collect data",
+         });
+    }
+
 
     
     for(const i of results){
@@ -63,12 +72,20 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
 
     if(db_recent < recent){
         await EditTransaction(recent);
-        await handleTelegramMessage();
-        return res.status(200).json({ 
-            error: false,
-            message: "Change",
-            data: recent
-        });
+        try {
+            await handleTelegramMessage();
+            return res.status(200).json({ 
+                error: false,
+                message: "Change",
+                data: recent
+            });
+        } catch (error) {
+            return res.status(401).json({ 
+                error: true,
+                message: "Failed to send message",
+             });
+        }
+
     }
 
 }
