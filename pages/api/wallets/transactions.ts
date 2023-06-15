@@ -17,30 +17,32 @@ const handleTelegramMessage = async () => {
 export default async function transactions(req:NextApiRequest, res:NextApiResponse) {
     if (req.method !== 'GET') {
       return res.status(405).json({ message: 'Method Not Allowed' });
+      
     }
-    
 
+    if(!process.env.TELEGRAM_CHAT_ID || !process.env.API_KEY || !process.env.TELEGRAM_CHAT_ID ){
+        return res.status(401).json({ 
+            error: true,
+            message: "No ENV",
+         });
+    }
+
+    res.setHeader('Cache-Control', 'no-store, max-age=0');
     const wallets = await GetWallets();
     let results: Response[] = []
     let transactions: any = [];
     let headers = new Headers();
     headers.set('Authorization', `Bearer ${process.env.API_KEY}`)
 
-    try {
-        results = await Promise.all(wallets.wallets.rows?.map((o,i) => {
-            return fetch(`https://api.covalenthq.com/v1/eth-mainnet/address/${o.address}/transactions_summary/`, {
-                method: "GET",
-                headers: headers
-              })
-        }))
-    } catch (error) {
-        return res.status(401).json({ 
-            error: true,
-            message: "Failed to collect data",
-        });
-    }
+    results = await Promise.all(wallets.wallets.rows?.map((o,i) => {
+        return fetch(`https://api.covalenthq.com/v1/eth-mainnet/address/${o.address}/transactions_summary/`, {
+            method: "GET",
+            headers: headers
+            })
+    }))
+    
 
-    if(results.length <= 0){
+    if(!results || results.length <= 0){
         return res.status(401).json({ 
             error: true,
             message: "No transactions",
@@ -92,7 +94,7 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
     if(db_recent < recent){
         await EditTransaction(recent);
         try {
-            // await handleTelegramMessage();
+            await handleTelegramMessage();
             return res.status(200).json({ 
                 error: false,
                 message: "Change",
@@ -106,6 +108,12 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
         }
 
     }
+
+    return res.status(200).json({ 
+        error: false,
+        message: "No Change",
+        data: recent
+    });
 
 }
 
