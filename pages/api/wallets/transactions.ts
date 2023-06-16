@@ -68,6 +68,8 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
         transactions = [...transactions, latest]
     }
 
+    console.log(transactions)
+
     if(!transactions || transactions.length === 0){
         return res.status(500).json({ 
             error: true,
@@ -75,11 +77,11 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
         });
     }
 
+    const recent = new Date(Math.max(...transactions.map(((e: { block_signed_at: string | number | Date; }) => new Date(e.block_signed_at)))));
     const recentTransaction = transactions.sort((a: any, b: any) => {
         return new Date(b.block_signed_at).getTime() - new Date(a.block_signed_at).getTime();
       })[0];
     
-    const recent = recentTransaction.block_signed_at;
 
     const db = await GetLatestTransaction();
 
@@ -99,14 +101,6 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
         });
     }
     const db_recent = new Date(db.latest_transaction.rows[0].created_at);
-
-    if(db_recent >= recent){
-        return res.status(200).json({ 
-            error: false,
-            message: "No Change",
-            data: db_recent
-        });
-    }
     
     if(db_recent < recent){
         await EditTransaction(recent);
@@ -124,14 +118,19 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
                 message: "Failed to send message",
              });
         }
-
     }
 
-    return res.status(200).json({ 
-        error: false,
-        message: "No Change",
-        data: recent
-    });
+    if(db_recent >= recent){
+        return res.status(200).json({ 
+            error: false,
+            message: "No Change",
+            data: {
+                db_recent,
+                recent
+            }
+        });
+    }
+
 
 }
 
