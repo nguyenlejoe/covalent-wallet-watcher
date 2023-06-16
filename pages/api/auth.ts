@@ -9,7 +9,7 @@ export default async function auth(req:NextApiRequest, res:NextApiResponse) {
     let decode
 
     try {
-        decode = jwt.verify(token, 'shh');
+        decode = jwt.verify(token, process.env.CLIENT_SECRET);
     } catch (error) {
         decode = false;
     }

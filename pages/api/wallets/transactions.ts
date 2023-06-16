@@ -1,7 +1,9 @@
 import { CreateTransaction, EditTransaction, GetLatestTransaction, GetWallets } from '@/lib/wallet';
 import { NextApiRequest, NextApiResponse } from 'next';
 
-const handleTelegramMessage = async () => {
+const handleTelegramMessage = async (tx: any) => {
+    const message = `Recent transaction alert From: ${tx.from_address} To: ${tx.to_address} Value: ${tx.value} Time: ${tx.block_signed_at}`;
+
     await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_ID}/sendMessage`, {
         method: "POST",
         headers: {
@@ -9,20 +11,31 @@ const handleTelegramMessage = async () => {
         },
         body: JSON.stringify({
             chat_id: process.env.TELEGRAM_CHAT_ID,
-            text: "There has been a new transaction! Please visit your wallet application for more details",
+            text: message,
             parse_mode: "HTML"
         }), 
     })
 }
- 
+
+const handleTransaction = async (address: string) => {
+    let headers = new Headers();
+    headers.set('Authorization', `Bearer ${process.env.API_KEY}`);
+
+    const resp = await fetch(`https://api.covalenthq.com/v1/eth-mainnet/transaction_v2/${address}/`, {
+        method: "GET",
+        headers: headers
+    })
+
+    return await resp.json();
+}
+
 export default async function transactions(req:NextApiRequest, res:NextApiResponse) {
     if (req.method !== 'GET') {
       return res.status(405).json({ message: 'Method Not Allowed' });
-      
     }
 
     if(!process.env.TELEGRAM_CHAT_ID || !process.env.API_KEY || !process.env.TELEGRAM_CHAT_ID ){
-        return res.status(401).json({ 
+        return res.status(500).json({ 
             error: true,
             message: "No ENV",
          });
@@ -41,10 +54,9 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
             headers: headers
         })
     }))
-    
 
     if(!results || results.length <= 0){
-        return res.status(401).json({ 
+        return res.status(500).json({ 
             error: true,
             message: "No transactions",
         });
@@ -52,22 +64,27 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
     
     for(const i of results){
         const resp = await i.json();
-        const latest = resp.data.items[0].latest_transaction.block_signed_at
+        const latest = resp.data.items[0].latest_transaction
         transactions = [...transactions, latest]
     }
 
     if(!transactions || transactions.length === 0){
-        return res.status(401).json({ 
+        return res.status(500).json({ 
             error: true,
             message: "No transactions",
         });
     }
 
-    const recent = new Date(Math.max(...transactions.map((e: string | number | Date) => new Date(e))));
+    const recentTransaction = transactions.sort((a: any, b: any) => {
+        return new Date(b.block_signed_at).getTime() - new Date(a.block_signed_at).getTime();
+      })[0];
+    
+    const recent = recentTransaction.block_signed_at;
+
     const db = await GetLatestTransaction();
 
     if(!recent || !db){
-        return res.status(401).json({ 
+        return res.status(500).json({ 
             error: true,
             message: "No recent",
         });
@@ -78,7 +95,7 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
         return res.status(200).json({ 
             error: false,
             message: "First run",
-            data: transactions
+            data: recentTransaction
         });
     }
     const db_recent = new Date(db.latest_transaction.rows[0].created_at);
@@ -87,22 +104,22 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
         return res.status(200).json({ 
             error: false,
             message: "No Change",
-            data: recent
+            data: db_recent
         });
     }
     
-
     if(db_recent < recent){
         await EditTransaction(recent);
         try {
-            await handleTelegramMessage();
+            const transaction_detail = await handleTransaction(recentTransaction.tx_hash);
+            await handleTelegramMessage(transaction_detail.data.items[0]);
             return res.status(200).json({ 
                 error: false,
                 message: "Change",
-                data: recent
+                data: transaction_detail
             });
         } catch (error) {
-            return res.status(401).json({ 
+            return res.status(500).json({ 
                 error: true,
                 message: "Failed to send message",
              });

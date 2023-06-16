@@ -11,7 +11,7 @@ export default async function login(req:NextApiRequest, res:NextApiResponse) {
     if (username === process.env.NEXT_PUBLIC_USER_NAME && password ===  process.env.NEXT_PUBLIC_USER_PASSWORD) {
       const token = jwt.sign({
         isLogged: true
-      }, "shh")
+      }, process.env.CLIENT_SECRET)
       res.setHeader('Set-Cookie', `wallet_token=${token}; HttpOnly; Path=/`);
       return res.status(200).json({ 
           error: false,

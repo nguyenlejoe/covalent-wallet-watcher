@@ -9,8 +9,12 @@ const columns: GridColDef[] = [
   { field: 'col4', headerName: 'Value', width: 200 },
 ];
 
+interface DataTableProps {
+  rows: Array<any>;
+}
 
-export default function DataTable({rows}) {
+
+export default function DataTable({rows}: DataTableProps) {
   return (
     <div style={{ height:"80vh", width: '100%' }}>
       <DataGrid rows={rows} columns={columns} />

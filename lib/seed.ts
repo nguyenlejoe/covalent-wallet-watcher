@@ -8,7 +8,12 @@ export async function seed() {
       email VARCHAR(255) UNIQUE NOT NULL,
       image VARCHAR(255),
       "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
+    )
+
+    CREATE TABLE latest_transaction (
+      id SERIAL PRIMARY KEY,
+      created_at TIMESTAMP
+    )
     `
 
   console.log(`Created "users" table`)
@@ -31,7 +36,7 @@ export async function seed() {
       `,
   ])
   console.log(`Seeded ${users.length} users`)
-
+// 
   return {
     createTable,
     users,
