@@ -1,5 +1,7 @@
 import { CreateTransaction, EditTransaction, GetLatestTransaction, GetWallets } from '@/lib/wallet';
 import { NextApiRequest, NextApiResponse } from 'next';
+import data from "../../../config.json";
+import { Filter } from '@/lib/filter';
 
 const handleTelegramMessage = async (tx: any) => {
     const message = `Recent transaction alert From: ${tx.from_address} To: ${tx.to_address} Value: ${tx.value} Time: ${tx.block_signed_at}`;
@@ -43,10 +45,64 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
 
     res.setHeader('Cache-Control', 'no-store, max-age=0');
     const wallets = await GetWallets();
-    let results: Response[] = []
-    let transactions: any = [];
+    // let results: Response[] = []
     let headers = new Headers();
-    headers.set('Authorization', `Bearer ${process.env.API_KEY}`)
+    headers.set('Authorization', `Bearer ${process.env.API_KEY}`);
+    console.log(data)
+
+
+    for(const i of data.alerts){
+        const db_recent = (await GetLatestTransaction()).latest_transaction.rows[0].created_at;
+
+        const results = await Promise.all(i.addresses.map(async (o,i) => {
+            const resp =  fetch(`https://api.covalenthq.com/v1/eth-mainnet/address/${o}/transactions_v3/`, {
+                method: "GET",
+                headers: headers
+            }).then(resp => resp.json())
+
+            const transactions = await resp;
+            return [...transactions.data.items]
+        }))
+
+        const transactions = results.flat().sort((a: any, b: any) => {
+            return new Date(b.block_signed_at).getTime() - new Date(a.block_signed_at).getTime();
+        });
+
+        for(const i of transactions){
+
+            if(new Date(i.block_signed_at) > db_recent){
+
+                const ping = Filter(i);
+
+                console.log(ping)
+                if(ping){
+
+                    console.log(i)
+                    // const transaction_detail = await handleTransaction(recentTransaction.tx_hash);
+                    // await handleTelegramMessage(i);
+                    // return res.status(200).json({ 
+                    //     error: false,
+                    //     message: "Change",
+                    //     data: transaction_detail
+                    // });
+                }
+            }
+        }
+
+
+        return res.status(200).json({ 
+            error: false,
+            message: "First run",
+            data: transactions
+        });
+    }
+
+    
+    return res.status(200).json({ 
+        error: false,
+        message: "First run",
+        data: "test"
+    });
 
     results = await Promise.all(wallets.wallets.rows?.map((o,i) => {
         return fetch(`https://api.covalenthq.com/v1/eth-mainnet/address/${o.address}/transactions_summary/`, {
@@ -68,8 +124,6 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
         transactions = [...transactions, latest]
     }
 
-    console.log(transactions)
-
     if(!transactions || transactions.length === 0){
         return res.status(500).json({ 
             error: true,
@@ -80,7 +134,7 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
     const recent = new Date(Math.max(...transactions.map(((e: { block_signed_at: string | number | Date; }) => new Date(e.block_signed_at)))));
     const recentTransaction = transactions.sort((a: any, b: any) => {
         return new Date(b.block_signed_at).getTime() - new Date(a.block_signed_at).getTime();
-      })[0];
+    })[0];
     
 
     const db = await GetLatestTransaction();
@@ -101,7 +155,7 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
         });
     }
     const db_recent = new Date(db.latest_transaction.rows[0].created_at);
-    
+
     if(db_recent < recent){
         await EditTransaction(recent);
         try {
