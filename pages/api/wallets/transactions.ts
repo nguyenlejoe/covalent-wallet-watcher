@@ -4,7 +4,6 @@ import {config} from "../../../config";
 import { TransactionsFilter } from '@/lib/filter';
 
 const handleTelegramMessage = async (tx: any) => {
-    console.log(tx)
     const message = `Recent transaction alert From: ${tx.from_address} To: ${tx.to_address} Value: ${tx.value} Time: ${tx.block_signed_at}`;
 
     await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_ID}/sendMessage`, {
@@ -19,18 +18,6 @@ const handleTelegramMessage = async (tx: any) => {
         }), 
     })
 }
-
-// const handleTransaction = async (address: string) => {
-//     let headers = new Headers();
-//     headers.set('Authorization', `Bearer ${process.env.API_KEY}`);
-
-//     const resp = await fetch(`https://api.covalenthq.com/v1/eth-mainnet/transaction_v2/${address}/`, {
-//         method: "GET",
-//         headers: headers
-//     })
-
-//     return await resp.json();
-// }
 
 export default async function transactions(req:NextApiRequest, res:NextApiResponse) {
     if (req.method !== 'GET') {
@@ -102,8 +89,7 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
 
     return res.status(200).json({ 
         error: false,
-        message: "First run",
-        data: "test"
+        message: "Cron Ran"
     });
 
 
