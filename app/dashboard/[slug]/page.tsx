@@ -8,7 +8,6 @@ async function getData (id: string ) {
   let headers = new Headers();
 
   headers.set('Authorization', `Bearer ${process.env.API_KEY}`)
-
   const results = await Promise.all(addresses.map((o,i) => {
       return fetch(`https://api.covalenthq.com/v1/eth-mainnet/address/${o}/transactions_v3/`, {
           method: "GET",
@@ -17,12 +16,8 @@ async function getData (id: string ) {
       .then(resp => resp.json())
       .then(data => data.data.items);
     }));
-  
-    for(const i of await results){
-      transactions = [...transactions, ...i]
-    }
-  
-  return transactions.map((o, i) => {
+
+  return results.flat().map((o, i) => {
       return { id: i, col1: o.block_signed_at, col2: o.from_address, col3: o.to_address , col4: o.pretty_value_quote }
   })
 }
