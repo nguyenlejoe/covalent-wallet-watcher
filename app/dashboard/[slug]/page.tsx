@@ -1,9 +1,9 @@
 import DataTable from "@/components/data-table";
 import RefreshButton from "@/components/refresh-button";
-import data from "../../../config.json";
+import {config} from "../../../config";
 
 async function getData (id: string ) {
-  const addresses = data.alerts.filter(e => e.id === parseInt(id))[0].addresses;
+  const addresses = config.alerts.filter(e => e.id === parseInt(id))[0].addresses;
   let transactions: any[] = [];
   let headers = new Headers();
 

@@ -1,9 +1,10 @@
 import { CreateTransaction, EditTransaction, GetLatestTransaction, GetWallets } from '@/lib/wallet';
 import { NextApiRequest, NextApiResponse } from 'next';
-import data from "../../../config.json";
-import { Filter } from '@/lib/filter';
+import {config} from "../../../config";
+import { TransactionsFilter } from '@/lib/filter';
 
 const handleTelegramMessage = async (tx: any) => {
+    console.log(tx)
     const message = `Recent transaction alert From: ${tx.from_address} To: ${tx.to_address} Value: ${tx.value} Time: ${tx.block_signed_at}`;
 
     await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_ID}/sendMessage`, {
@@ -19,17 +20,17 @@ const handleTelegramMessage = async (tx: any) => {
     })
 }
 
-const handleTransaction = async (address: string) => {
-    let headers = new Headers();
-    headers.set('Authorization', `Bearer ${process.env.API_KEY}`);
+// const handleTransaction = async (address: string) => {
+//     let headers = new Headers();
+//     headers.set('Authorization', `Bearer ${process.env.API_KEY}`);
 
-    const resp = await fetch(`https://api.covalenthq.com/v1/eth-mainnet/transaction_v2/${address}/`, {
-        method: "GET",
-        headers: headers
-    })
+//     const resp = await fetch(`https://api.covalenthq.com/v1/eth-mainnet/transaction_v2/${address}/`, {
+//         method: "GET",
+//         headers: headers
+//     })
 
-    return await resp.json();
-}
+//     return await resp.json();
+// }
 
 export default async function transactions(req:NextApiRequest, res:NextApiResponse) {
     if (req.method !== 'GET') {
@@ -44,16 +45,28 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
     }
 
     res.setHeader('Cache-Control', 'no-store, max-age=0');
-    const wallets = await GetWallets();
-    // let results: Response[] = []
     let headers = new Headers();
     headers.set('Authorization', `Bearer ${process.env.API_KEY}`);
-    console.log(data)
+
+    // Go through each alert
+    for(const i of config.alerts){
+        // Get last time cron was called
+        const db = await GetLatestTransaction();
+
+        // If first time cron run, 
+        if(db.latest_transaction.rows.length === 0){
+            await CreateTransaction(new Date());
+            return res.status(200).json({ 
+                error: false,
+                message: "First run",
+                data: ""
+            });
+        }
+
+        const db_recent = new Date(db.latest_transaction.rows[0].created_at);
 
 
-    for(const i of data.alerts){
-        const db_recent = (await GetLatestTransaction()).latest_transaction.rows[0].created_at;
-
+        // Get latest transactions of addresses in the alert
         const results = await Promise.all(i.addresses.map(async (o,i) => {
             const resp =  fetch(`https://api.covalenthq.com/v1/eth-mainnet/address/${o}/transactions_v3/`, {
                 method: "GET",
@@ -64,126 +77,34 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
             return [...transactions.data.items]
         }))
 
+        // Sort by most recent and flatten array
         const transactions = results.flat().sort((a: any, b: any) => {
             return new Date(b.block_signed_at).getTime() - new Date(a.block_signed_at).getTime();
         });
 
-        for(const i of transactions){
-
-            if(new Date(i.block_signed_at) > db_recent){
-
-                const ping = Filter(i);
-
-                console.log(ping)
+        // Go through each transaction
+        for(const k of transactions){
+            // Only check transactions more recent than last cron
+            if(new Date(k.block_signed_at) > db_recent){
+                // Filter function for transaction
+                console.log("hit")
+                const ping = TransactionsFilter(k, i.filter, i.function);
                 if(ping){
-
-                    console.log(i)
-                    // const transaction_detail = await handleTransaction(recentTransaction.tx_hash);
-                    // await handleTelegramMessage(i);
-                    // return res.status(200).json({ 
-                    //     error: false,
-                    //     message: "Change",
-                    //     data: transaction_detail
-                    // });
+                    await handleTelegramMessage(k);
                 }
             }
         }
 
-
-        return res.status(200).json({ 
-            error: false,
-            message: "First run",
-            data: transactions
-        });
     }
 
-    
+    // Edit latest cron call
+    await EditTransaction(new Date());
+
     return res.status(200).json({ 
         error: false,
         message: "First run",
         data: "test"
     });
-
-    results = await Promise.all(wallets.wallets.rows?.map((o,i) => {
-        return fetch(`https://api.covalenthq.com/v1/eth-mainnet/address/${o.address}/transactions_summary/`, {
-            method: "GET",
-            headers: headers
-        })
-    }))
-
-    if(!results || results.length <= 0){
-        return res.status(500).json({ 
-            error: true,
-            message: "No transactions",
-        });
-    }
-    
-    for(const i of results){
-        const resp = await i.json();
-        const latest = resp.data.items[0].latest_transaction
-        transactions = [...transactions, latest]
-    }
-
-    if(!transactions || transactions.length === 0){
-        return res.status(500).json({ 
-            error: true,
-            message: "No transactions",
-        });
-    }
-
-    const recent = new Date(Math.max(...transactions.map(((e: { block_signed_at: string | number | Date; }) => new Date(e.block_signed_at)))));
-    const recentTransaction = transactions.sort((a: any, b: any) => {
-        return new Date(b.block_signed_at).getTime() - new Date(a.block_signed_at).getTime();
-    })[0];
-    
-
-    const db = await GetLatestTransaction();
-
-    if(!recent || !db){
-        return res.status(500).json({ 
-            error: true,
-            message: "No recent",
-        });
-    }
-
-    if(db.latest_transaction.rows.length === 0){
-        await CreateTransaction(recent);
-        return res.status(200).json({ 
-            error: false,
-            message: "First run",
-            data: recentTransaction
-        });
-    }
-    const db_recent = new Date(db.latest_transaction.rows[0].created_at);
-
-    if(db_recent < recent){
-        await EditTransaction(recent);
-        try {
-            const transaction_detail = await handleTransaction(recentTransaction.tx_hash);
-            await handleTelegramMessage(transaction_detail.data.items[0]);
-            return res.status(200).json({ 
-                error: false,
-                message: "Change",
-                data: transaction_detail
-            });
-        } catch (error) {
-            return res.status(500).json({ 
-                error: true,
-                message: "Failed to send message",
-             });
-        }
-    }
-
-    if(db_recent >= recent){
-        return res.status(200).json({ 
-            error: false,
-            message: "No Change",
-            data: {
-                db_recent,
-                recent
-            }
-        });
-    }
 
 
 }

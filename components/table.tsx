@@ -4,10 +4,10 @@ import RefreshButton from './refresh-button'
 import { seed } from '@/lib/seed'
 import { GetWallets } from '@/lib/wallet';
 import DataTable from './data-table';
-import data from "../config.json";
+import {config} from "../config";
 
 async function getData () {
-  const addresses = data.alerts[0].addresses;
+  const addresses = config.alerts[0].addresses;
   let transactions: any[] = [];
   let headers = new Headers();
 
