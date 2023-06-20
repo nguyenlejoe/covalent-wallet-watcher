@@ -1,57 +1,83 @@
----
-name: Vercel Postgres Next.js Starter
-slug: postgres-starter
-description: Simple Next.js template that uses Vercel Postgres as the database.
-framework: Next.js
-useCase: Starter
-css: Tailwind
-database: Vercel Postgres
-deployUrl: https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fexamples%2Ftree%2Fmain%2Fstorage%2Fpostgres-starter&project-name=postgres-starter&repository-name=postgres-starter&demo-title=Vercel%20Postgres%20Next.js%20Starter&demo-description=Simple%20Next.js%20template%20that%20uses%20Vercel%20Postgres%20as%20the%20database.&demo-url=https%3A%2F%2Fpostgres-starter.vercel.app%2F&demo-image=https%3A%2F%2Fpostgres-starter.vercel.app%2Fopengraph-image.png&stores=%5B%7B"type"%3A"postgres"%7D%5D
-demoUrl: https://postgres-starter.vercel.app/
-relatedTemplates:
-  - postgres-prisma
-  - postgres-kysely
-  - postgres-sveltekit
----
 
-# Vercel Postgres Next.js Starter
+# Covalent Vercel Postgres Next.js Starter
 
-Simple Next.js template that uses [Vercel Postgres](https://vercel.com/postgres) as the database.
+## Project Setup
 
-## Demo
+### Setting up vercel environment variables
 
-https://postgres-starter.vercel.app/
+#### *Visit the Covalent website:*
+[Sign in or create a new account](https://www.covalenthq.com/platform).
+Generate an API key in your account settings.
+Note down the generated API key.
 
-## How to Use
+#### *Obtain Telegram bot ID and chat ID:*
 
-You can choose from one of the following two methods to use this repository:
+Create a new Telegram bot by following the official Telegram Bot [documentation](https://core.telegram.org/bots/api).
+Retrieve the bot ID and chat ID. Note down these values.
 
-### One-Click Deploy
+### One click deploy and apply environment vairables
 
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=vercel-examples):
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fexamples%2Ftree%2Fmain%2Fstorage%2Fpostgres-starter&project-name=postgres-starter&repository-name=postgres-starter&demo-title=Vercel%20Postgres%20Next.js%20Starter&demo-description=Simple%20Next.js%20template%20that%20uses%20Vercel%20Postgres%20as%20the%20database.&demo-url=https%3A%2F%2Fpostgres-starter.vercel.app%2F&demo-image=https%3A%2F%2Fpostgres-starter.vercel.app%2Fopengraph-image.png&stores=%5B%7B"type"%3A"postgres"%7D%5D)
-
-### Clone and Deploy
-
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [pnpm](https://pnpm.io/installation) to bootstrap the example:
-
-```bash
-pnpm create next-app --example https://github.com/vercel/examples/tree/main/storage/postgres-starter
+```
+API_KEY=<your_covalent_api_key>
+TELEGRAM_CHAT_ID=<your_telegram_chat_id>
+TELEGRAM_BOT_ID=<your_telegram_bot_id>
+NEXT_PUBLIC_USER_NAME=<your_desired_username>
+NEXT_PUBLIC_USER_PASSWORD=<your_desired_password>
+CLIENT_SECRET=<your_desired_secret_key>
 ```
 
-Once that's done, copy the .env.example file in this directory to .env.local (which will be ignored by Git):
+Click the deploy vercel button and follow the steps to deploy the project using these variables.
 
-```bash
-cp .env.example .env.local
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fnguyenlejoe%2Fcovalent-wallet-watcher&env=API_KEY,TELEGRAM_CHAT_ID,TELEGRAM_BOT_ID,NEXT_PUBLIC_USER_NAME,NEXT_PUBLIC_USER_PASSWORD,CLIENT_SECRET&stores=%5B%7B%22type%22%3A%22postgres%22%7D%5D)
+
+
+## How to run the application
+
+1. Install dependencies.
+```
+yarn
 ```
 
-Then open `.env.local` and set the environment variables to match the ones in your Vercel Storage Dashboard.
+2. Connect your project to vercel's database.
 
-Next, run Next.js in development mode:
-
-```bash
-pnpm dev
+```
+vercel link
 ```
 
-Deploy it to the cloud with [Vercel](https://vercel.com/new?utm_source=github&utm_medium=readme&utm_campaign=vercel-examples) ([Documentation](https://nextjs.org/docs/deployment)).
+3. Pull environment variables into project.
+```
+vercel env pull .env
+```
+
+4. Configure your application settings in `config.ts`
+
+5. Run project.
+```
+yarn run dev
+```
+
+## Configuring your project
+
+Start adding alerts and address you would like to watch and add filters and functions to send messages to your telegram bot
+
+```
+export const config = {
+  "alerts": [
+    {
+        "id": 1,
+        "name": "example alert",
+        "addresses" : [
+            "0xF977814e90dA44bFA03b6295A0616a897441aceC",
+            "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+        ],
+        "filter": {},
+        "function": (data: any) => {
+            if(data.tx_hash === "0x336e1b01e8eeaf8bebef5233aa44eb71fca7939f10464e7ace95afbb9a46a554"){
+              return true;
+            }
+        }
+    }
+  ]
+}
+```
+
