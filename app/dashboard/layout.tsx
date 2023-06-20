@@ -53,7 +53,9 @@ export default async function DashboardLayout({
       <div className="flex flex-col gap-4 min-w-[25rem] shadow-xl bg-white/30 p-12">
          <AlertList/>
       </div>
-      {children}
+      <Suspense fallback={<TablePlaceholder />}>
+        {children}
+      </Suspense>
     </div>
   )
 }

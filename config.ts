@@ -13,6 +13,19 @@ export const config = {
               return true;
             }
         }
-    }
+    },
+    {
+      "id": 2,
+      "name": "second alert",
+      "addresses" : [
+          "demo.eth",
+      ],
+      "filter": {},
+      "function": (data: any) => {
+          if(data.tx_hash === "0x336e1b01e8eeaf8bebef5233aa44eb71fca7939f10464e7ace95afbb9a46a554"){
+            return true;
+          }
+      }
+  }
   ]
 }

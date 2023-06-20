@@ -4,7 +4,6 @@ import {config} from "../../../config";
 
 async function getData (id: string ) {
   const addresses = config.alerts.filter(e => e.id === parseInt(id))[0].addresses;
-  let transactions: any[] = [];
   let headers = new Headers();
 
   headers.set('Authorization', `Bearer ${process.env.API_KEY}`)

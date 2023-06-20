@@ -6,8 +6,12 @@ export default async function GetTelegramChat(req:NextApiRequest, res:NextApiRes
     if (req.method !== 'GET') {
       return res.status(405).json({ message: 'Method Not Allowed' });
     }
-
-    const token = ""
+    let token;
+    const authHeader = req.headers.authorization;
+  
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      token = authHeader.substring(7);
+    }
     let decode;
 
     try {
@@ -30,14 +34,14 @@ export default async function GetTelegramChat(req:NextApiRequest, res:NextApiRes
             "Content-Type": "application/json",
         }})
     
-    const result = await resp.json();  
+    const result = await resp.json(); 
     const chat = result.result;
 
     return res.status(200).json({ 
         error: false,
         message: "Successful",
         data: {
-            chat_id: chat
+            chat_id: result
         }
     });
     

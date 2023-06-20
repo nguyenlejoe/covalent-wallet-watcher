@@ -3,8 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import {config} from "../../../config";
 import { TransactionsFilter } from '@/lib/filter';
 
-const handleTelegramMessage = async (tx: any) => {
-    const message = `Recent transaction alert From: ${tx.from_address} To: ${tx.to_address} Value: ${tx.value} Time: ${tx.block_signed_at}`;
+const handleTelegramMessage = async (message: string) => {
 
     await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_ID}/sendMessage`, {
         method: "POST",
@@ -52,7 +51,6 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
 
         const db_recent = new Date(db.latest_transaction.rows[0].created_at);
 
-
         // Get latest transactions of addresses in the alert
         const results = await Promise.all(i.addresses.map(async (o,i) => {
             const resp =  fetch(`https://api.covalenthq.com/v1/eth-mainnet/address/${o}/transactions_v3/`, {
@@ -63,6 +61,15 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
             const transactions = await resp;
             return [...transactions.data.items]
         }))
+        .catch(async function(err) {
+            await handleTelegramMessage(err.message);
+        });
+
+        if(!results){
+            return res.status(402).json({ 
+                error: true,
+            });
+        }
 
         // Sort by most recent and flatten array
         const transactions = results.flat().sort((a: any, b: any) => {
@@ -74,10 +81,10 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
             // Only check transactions more recent than last cron
             if(new Date(k.block_signed_at) > db_recent){
                 // Filter function for transaction
-                console.log("hit")
+                const message = `Recent transaction alert From: ${k.from_address} To: ${k.to_address} Value: ${k.value} Time: ${k.block_signed_at}`;
                 const ping = TransactionsFilter(k, i.filter, i.function);
                 if(ping){
-                    await handleTelegramMessage(k);
+                    await handleTelegramMessage(message);
                 }
             }
         }
