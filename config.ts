@@ -29,3 +29,8 @@ export const config = {
   }
   ]
 }
+
+////// FILTERS
+// "successful": true
+// "to_address": "0xE592427A0AEce92De3Edee1F18E0157C05861564"
+// "log_events" [ "raw_log_topics": ["0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67"] ]
