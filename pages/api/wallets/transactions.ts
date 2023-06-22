@@ -81,10 +81,10 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
             // Only check transactions more recent than last cron
             if(new Date(k.block_signed_at) > db_recent){
                 // Filter function for transaction
-                const message = `Recent transaction alert From: ${k.from_address} To: ${k.to_address} Value: ${k.value} Time: ${k.block_signed_at}`;
-                const ping = TransactionsFilter(k, i.filter, i.function);
+                // const message = `Recent transaction alert From: ${k.from_address} To: ${k.to_address} Value: ${k.value} Time: ${k.block_signed_at}`;
+                const ping = i.filter(k);
                 if(ping){
-                    await handleTelegramMessage(message);
+                    await handleTelegramMessage(i.message);
                 }
             }
         }
