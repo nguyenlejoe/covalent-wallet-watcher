@@ -18,8 +18,8 @@ export const config = {
             }
 
             for(const i of data.log_events){
-                if(i.raw_log_topics[0] === raw_log_topics_filter_1){
-                    if(i.raw_log_topics[2] === raw_log_topics_filter_2){
+                if(i.raw_log_topics[0] === raw_log_topics_filter_1.toLowerCase()){
+                    if(i.raw_log_topics[2] === raw_log_topics_filter_2.toLowerCase()){
                         ping = true;
                         break;
                     }
