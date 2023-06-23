@@ -13,7 +13,7 @@ export const config = {
             const raw_log_topics_filter_2 = "0x0000000000000000000000009507c04B10486547584C37bCBd931B2a4FeE9A41"
             let ping = false;
 
-            if(data.to_address !== to_filter){
+            if(data.to_address !== to_filter.toLowerCase()){
               return ping;
             }
 
