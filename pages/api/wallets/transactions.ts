@@ -1,13 +1,14 @@
 import { CreateTransaction, EditTransaction, GetLatestTransaction, GetWallets } from '@/lib/wallet';
 import { NextApiRequest, NextApiResponse } from 'next';
 import {config} from "../../../config";
-const formData = require('form-data');
 const Mailgun = require('mailgun.js');
+const formData = require('form-data');
 const mailgun = new Mailgun(formData);
 const mg = mailgun.client({
-	username: 'api',
-	key: '6b6df6c76f2f1c11a6c2de6ef2dea1f4-e5475b88-2f777a5d',
+    username: 'api',
+    key: process.env.MAILGUN_KEY,
 });
+
 
 const handleTelegramMessage = async (message: string) => {
     await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_ID}/sendMessage`, {
@@ -25,6 +26,7 @@ const handleTelegramMessage = async (message: string) => {
 
 
 const handleEmail = async (to: string[], message: string, subject: string) => {
+
     mg.messages
 	.create("sandbox1de7d4375ff248ba90ae4124717756eb.mailgun.org", {
 		from: "Mailgun Sandbox <postmaster@sandbox1de7d4375ff248ba90ae4124717756eb.mailgun.org>",
@@ -34,12 +36,6 @@ const handleEmail = async (to: string[], message: string, subject: string) => {
 	});
 }
 
-
-
-// You can see a record of this email in your logs: https://app.mailgun.com/app/logs.
-
-// You can send up to 300 emails/day from this sandbox server.
-// Next, you should add your own domain so you can send 10000 emails/month for free.
 
 export default async function transactions(req:NextApiRequest, res:NextApiResponse) {
     if (req.method !== 'GET') {
