@@ -26,10 +26,9 @@ const handleTelegramMessage = async (message: string) => {
 
 
 const handleEmail = async (to: string[], message: string, subject: string) => {
-
     mg.messages
-	.create("sandbox1de7d4375ff248ba90ae4124717756eb.mailgun.org", {
-		from: "Mailgun Sandbox <postmaster@sandbox1de7d4375ff248ba90ae4124717756eb.mailgun.org>",
+	.create(`${process.env.MAILGUN_DOMAIN}`, {
+		from: `Mailgun Sandbox <postmaster@${process.env.MAILGUN_DOMAIN}>`,
 		to: to,
 		subject: subject,
 		text: message,
