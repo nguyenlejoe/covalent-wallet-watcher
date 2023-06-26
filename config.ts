@@ -25,7 +25,7 @@ export const config = {
               return ping
             }
 
-            if(data.to_address !== to_filter){
+            if(data.to_address !== to_filter.toLowerCase()){
               return ping;
             }
 
