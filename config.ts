@@ -6,12 +6,24 @@ export const config = {
         "addresses" : [
             "0x9507c04B10486547584C37bCBd931B2a4FeE9A41"
         ],
+        "email": {
+          "active": true,
+          "to": ["joe@covalenthq.com"],
+          "subject": "New activity alert"
+        },
+        "telegram": {
+          "active" : true
+        },
         "message": "Jump Trading Activity",
         "filter": (data: any) => {
             const to_filter = "0x9507c04B10486547584C37bCBd931B2a4FeE9A41";
             const raw_log_topics_filter_1 = "0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67"
             const raw_log_topics_filter_2 = "0x0000000000000000000000009507c04B10486547584C37bCBd931B2a4FeE9A41"
             let ping = false;
+
+            if(!data.successful){
+              return ping
+            }
 
             if(data.to_address !== to_filter){
               return ping;

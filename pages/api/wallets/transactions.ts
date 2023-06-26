@@ -1,10 +1,15 @@
 import { CreateTransaction, EditTransaction, GetLatestTransaction, GetWallets } from '@/lib/wallet';
 import { NextApiRequest, NextApiResponse } from 'next';
 import {config} from "../../../config";
-import { TransactionsFilter } from '@/lib/filter';
+const formData = require('form-data');
+const Mailgun = require('mailgun.js');
+const mailgun = new Mailgun(formData);
+const mg = mailgun.client({
+	username: 'api',
+	key: '6b6df6c76f2f1c11a6c2de6ef2dea1f4-e5475b88-2f777a5d',
+});
 
 const handleTelegramMessage = async (message: string) => {
-
     await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_ID}/sendMessage`, {
         method: "POST",
         headers: {
@@ -17,6 +22,24 @@ const handleTelegramMessage = async (message: string) => {
         }), 
     })
 }
+
+
+const handleEmail = async (to: string[], message: string, subject: string) => {
+    mg.messages
+	.create("sandbox1de7d4375ff248ba90ae4124717756eb.mailgun.org", {
+		from: "Mailgun Sandbox <postmaster@sandbox1de7d4375ff248ba90ae4124717756eb.mailgun.org>",
+		to: to,
+		subject: subject,
+		text: message,
+	});
+}
+
+
+
+// You can see a record of this email in your logs: https://app.mailgun.com/app/logs.
+
+// You can send up to 300 emails/day from this sandbox server.
+// Next, you should add your own domain so you can send 10000 emails/month for free.
 
 export default async function transactions(req:NextApiRequest, res:NextApiResponse) {
     if (req.method !== 'GET') {
@@ -81,10 +104,16 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
             // Only check transactions more recent than last cron
             if(new Date(k.block_signed_at) > db_recent){
                 // Filter function for transaction
+
                 // const message = `Recent transaction alert From: ${k.from_address} To: ${k.to_address} Value: ${k.value} Time: ${k.block_signed_at}`;
                 const ping = i.filter(k);
                 if(ping){
-                    await handleTelegramMessage(i.message);
+                    if(i.telegram.active){
+                        await handleTelegramMessage(i.message);
+                    }
+                    if(i.email.active){
+                        await handleEmail(i.email.to, i.message, i.email.subject);
+                    }
                 }
             }
         }
