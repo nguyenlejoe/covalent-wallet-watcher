@@ -5,24 +5,20 @@
 
 ### Setting up vercel environment variables
 
-#### *Visit the Covalent website:*
+1. Visit the Covalent website:
 [Sign in or create a new account](https://www.covalenthq.com/platform).
 Generate an API key in your account settings.
 Note down the generated API key.
 
-Choose and follow at least one of these for your preferred messaging platform.
+**Setting up both telegram and email is optional but choosing atleast one is manditory**
 
-#### *Obtain Telegram bot ID and chat ID:*
+2. Obtain Telegram bot ID and chat ID: Create a new Telegram bot by following the official Telegram Bot [documentation](https://core.telegram.org/bots/api). Retrieve the bot ID and chat ID. Note down these values.
 
-Create a new Telegram bot by following the official Telegram Bot [documentation](https://core.telegram.org/bots/api).
-Retrieve the bot ID and chat ID. Note down these values.
+2. Obtain Mailgun Key and domain: [Sign in or create a new account](https://www.mailgun.com/). Retrieve mailgun key and domain after setting up an account.
 
-#### *Obtain Mailgun Key and domain:*
+3. Click the deploy vercel button and follow the steps to deploy the project using these variables.
 
-[Sign in or create a new account](https://www.mailgun.com/).
-Retrieve mailgun key and domain after setting up an account.
-
-### One click deploy and apply environment vairables
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fnguyenlejoe%2Fcovalent-wallet-watcher&env=API_KEY,TELEGRAM_CHAT_ID,TELEGRAM_BOT_ID,NEXT_PUBLIC_USER_NAME,NEXT_PUBLIC_USER_PASSWORD,CLIENT_SECRET,MAILGUN_KEY,MAILGUN_DOMAIN&stores=%5B%7B%22type%22%3A%22postgres%22%7D%5D)
 
 ```
 API_KEY=<your_covalent_api_key>
@@ -35,9 +31,7 @@ MAILGUN_KEY=<your_mailgun_api_key>
 MAILGUN_DOMAIN=<your_mailgun_domain>
 ```
 
-Click the deploy vercel button and follow the steps to deploy the project using these variables.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fnguyenlejoe%2Fcovalent-wallet-watcher&env=API_KEY,TELEGRAM_CHAT_ID,TELEGRAM_BOT_ID,NEXT_PUBLIC_USER_NAME,NEXT_PUBLIC_USER_PASSWORD,CLIENT_SECRET&stores=%5B%7B%22type%22%3A%22postgres%22%7D%5D)
 
 
 ## How to run the application
