@@ -10,7 +10,7 @@
 Generate an API key in your account settings.
 Note down the generated API key.
 
-**Setting up both telegram and email is optional but choosing atleast one is manditory**
+**Setting up both telegram and email is optional but choosing atleast one is mandatory**
 
 2. Obtain Telegram bot ID and chat ID: Create a new Telegram bot by following the official Telegram Bot [documentation](https://core.telegram.org/bots/api). Retrieve the bot ID and chat ID. Note down these values.
 
@@ -32,6 +32,10 @@ MAILGUN_DOMAIN=<your_mailgun_domain>
 
 
 ## How to run the application
+
+```
+git clone <repo>
+```
 
 1. Install dependencies.
 ```
