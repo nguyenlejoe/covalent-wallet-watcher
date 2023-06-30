@@ -1,6 +1,7 @@
 import { CreateTransaction, EditTransaction, GetLatestTransaction, GetWallets } from '@/lib/wallet';
 import { NextApiRequest, NextApiResponse } from 'next';
 import {config} from "../../../config";
+import { seed } from '@/lib/seed';
 const Mailgun = require('mailgun.js');
 const formData = require('form-data');
 const mailgun = new Mailgun(formData);
@@ -41,10 +42,10 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
       return res.status(405).json({ message: 'Method Not Allowed' });
     }
 
-    if(!process.env.TELEGRAM_CHAT_ID || !process.env.API_KEY || !process.env.TELEGRAM_CHAT_ID ){
+    if(!process.env.API_KEY){
         return res.status(500).json({ 
             error: true,
-            message: "No ENV",
+            message: "Missing ENV",
          });
     }
 
@@ -55,7 +56,24 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
     // Go through each alert
     for(const i of config.alerts){
         // Get last time cron was called
-        const db = await GetLatestTransaction();
+        let db
+        try {
+            db = await GetLatestTransaction();
+        } catch (e: any) {
+            if (e.message === `relation "latest_transaction" does not exist`) {
+                await seed();
+            }
+            db = await GetLatestTransaction();
+        }
+
+        if(!db){
+            return res.status(500).json({ 
+                error: false,
+                message: "No database found",
+                data: ""
+            });
+        }
+
 
         // If first time cron run, 
         if(db.latest_transaction.rows.length === 0){
