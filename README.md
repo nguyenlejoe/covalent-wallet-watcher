@@ -18,20 +18,17 @@ Note down the generated API key.
 
 3. Click the deploy vercel button and follow the steps to deploy the project using these variables.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fnguyenlejoe%2Fcovalent-wallet-watcher&env=API_KEY,TELEGRAM_CHAT_ID,TELEGRAM_BOT_ID,NEXT_PUBLIC_USER_NAME,NEXT_PUBLIC_USER_PASSWORD,CLIENT_SECRET,MAILGUN_KEY,MAILGUN_DOMAIN&stores=%5B%7B%22type%22%3A%22postgres%22%7D%5D)
+4. When filling telegram or mailgun environment vairables, fill the input with `""` if you choose not to use it.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fnguyenlejoe%2Fcovalent-wallet-watcher&env=API_KEY,TELEGRAM_CHAT_ID,TELEGRAM_BOT_ID,MAILGUN_KEY,MAILGUN_DOMAIN&stores=%5B%7B%22type%22%3A%22postgres%22%7D%5D)
 
 ```
 API_KEY=<your_covalent_api_key>
 TELEGRAM_CHAT_ID=<your_telegram_chat_id>
 TELEGRAM_BOT_ID=<your_telegram_bot_id>
-NEXT_PUBLIC_USER_NAME=<your_desired_username>
-NEXT_PUBLIC_USER_PASSWORD=<your_desired_password>
-CLIENT_SECRET=<your_desired_secret_key>
 MAILGUN_KEY=<your_mailgun_api_key>
 MAILGUN_DOMAIN=<your_mailgun_domain>
 ```
-
-
 
 
 ## How to run the application
@@ -65,15 +62,17 @@ In the `config.ts` file, you can define an array of alerts. Each alert can have 
 
 1. Configure Alerts: Edit the `config.ts` file to define your alerts. Each alert should include the addresses to watch and the filter function that determines the matching criteria.
 
-2. Define Cron Time: Open the `vercel.json` file and set the cron time. The example is set to run every 5 minutes, but you can adjust it according to your requirements.
+2. Choosing either telegram and or mailgun: the `active` field is to disable or enable messaging for each alert
+
+3. Define Cron Time: Open the `vercel.json` file and set the cron time. The example is set to run every day, but you can adjust it according to your requirements.
 
 ```
-"schedule": "*/5 * * * *"
+"schedule": "0 0 * * *"
 ```
 
-3. Deploy Project: Push your changes to the main branch and deploy the project using the Vercel platform.
+4. Deploy Project: Push your changes to the main branch and deploy the project using the Vercel platform.
 
-4. Enable Cron Job: Go to your project settings in Vercel and locate the option to enable the cron job. Turn it on to start the scheduled processing based on the defined cron time.
+5. Enable Cron Job: Go to your project settings in Vercel and locate the option to enable the cron job. Turn it on to start the scheduled processing based on the defined cron time.
 
 Start adding alerts and address you would like to watch and add filters and functions to send messages to your telegram bot / email
 
@@ -125,5 +124,10 @@ export const config = {
     }
   ]
 }
+```
+
+Try running the cron endpoint locally to see results.
+```
+http://localhost:3000/api/wallets/transactions
 ```
 
