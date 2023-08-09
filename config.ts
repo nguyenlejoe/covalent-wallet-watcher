@@ -16,7 +16,7 @@ export const config = {
           },
         "message": "Uniswap Swap Event",
         "filter": (data: any) => {
-            const to_filter = "0xE592427A0AEce92De3Edee1F18E0157C05861564";
+            const to_filter = "0x9507c04B10486547584C37bCBd931B2a4FeE9A41";
             const raw_log_topics_filter_1 = "0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67"
             const raw_log_topics_filter_2 = "0x0000000000000000000000009507c04B10486547584C37bCBd931B2a4FeE9A41"
             let ping = false;
@@ -86,7 +86,7 @@ export const config = {
     "id": 3,
     "name": "CQT Transfer Signal: Nomad Bridge Hacker",
     "addresses" : [
-        "0x56D8B635A7C88Fd1104D23d632AF40c1C3Aac4e3" // Hacked Nomad Bridge for millions of dollars in CQT. Stills holds all of his CQT. 
+        "0x56D8B635A7C88Fd1104D23d632AF40c1C3Aac4e3" // Hacked Nomad Bridge for millions of dollars in CQT. Stills holds all of his CQT.
     ],
     "email": {
         "active": true,
