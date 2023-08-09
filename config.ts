@@ -2,9 +2,9 @@ export const config = {
   "alerts": [
     {
         "id": 1,
-        "name": "Uniswap Trade Alert: Jump Trading",
+        "name": "Uniswap Trade Alert: Large MEV Bot",
         "addresses" : [
-            "0x9507c04B10486547584C37bCBd931B2a4FeE9A41" // Jump Trading - the biggest crypto trading fund
+            "0xA69BABEF1CA67A37FFAF7A485DFFF3382056E78C" // MEV Bot 
         ],
         "email": {
             "active": true,
@@ -16,9 +16,9 @@ export const config = {
           },
         "message": "Uniswap Swap Event",
         "filter": (data: any) => {
-            const to_filter = "0x9507c04B10486547584C37bCBd931B2a4FeE9A41";
+            const to_filter = "0xA69BABEF1CA67A37FFAF7A485DFFF3382056E78C";
             const raw_log_topics_filter_1 = "0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67"
-            const raw_log_topics_filter_2 = "0x0000000000000000000000009507c04B10486547584C37bCBd931B2a4FeE9A41"
+            const raw_log_topics_filter_2 = "0x000000000000000000000000A69BABEF1CA67A37FFAF7A485DFFF3382056E78C"
             let ping = false;
 
             if(data.to_address !== to_filter.toLowerCase()){
