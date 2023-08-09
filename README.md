@@ -135,3 +135,16 @@ Try running the cron endpoint locally to see results.
 http://localhost:3000/api/wallets/transactions
 ```
 
+
+## Examples
+There are numerous examples in the config.ts file of the project that can get you started with building alerts. Here's a breakdown of what each example does:
+
+**Example 1 ("id": 1)**: Watches an Uniswap V3 trades of a MEV Bot (```0xA69BABEF1CA67A37FFAF7A485DFFF3382056E78C```).
+```
+0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67 // 
+```
+**Example 2 ("id": 2)**:
+**Example 3 ("id": 3)**:
+
+
+
