@@ -99,12 +99,14 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
             return [...transactions.data.items]
         }))
         .catch(async function(err) {
+            console.log(err)
             await handleTelegramMessage(err.message);
         });
 
         if(!results){
-            return res.status(402).json({ 
+            return res.status(500).json({ 
                 error: true,
+                results: "noen"
             });
         }
 
