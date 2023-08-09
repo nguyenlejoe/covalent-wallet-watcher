@@ -52,6 +52,7 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
     res.setHeader('Cache-Control', 'no-store, max-age=0');
     let headers = new Headers();
     headers.set('Authorization', `Bearer ${process.env.API_KEY}`);
+    let cron_ping = false;
 
     // Go through each alert
     for(const i of config.alerts){
@@ -120,6 +121,9 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
 
                 // const message = `Recent transaction alert From: ${k.from_address} To: ${k.to_address} Value: ${k.value} Time: ${k.block_signed_at}`;
                 const ping = i.filter(k);
+                if(!cron_ping){
+                    cron_ping = ping;
+                }
                 if(ping){
                     if(i.telegram.active){
                         await handleTelegramMessage(i.message);
@@ -138,7 +142,8 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
 
     return res.status(200).json({ 
         error: false,
-        message: "Cron Ran"
+        message: "Cron Ran",
+        ping: cron_ping
     });
 
 
