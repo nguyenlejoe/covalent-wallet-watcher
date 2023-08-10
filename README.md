@@ -137,14 +137,20 @@ http://localhost:3000/api/wallets/transactions
 
 
 ## Examples
-There are numerous examples in the config.ts file of the project that can get you started with building alerts. Here's a breakdown of what each example does:
+The config.ts file houses several practical examples to guide you in crafting alerts. Here’s a summary of each:
 
-**Example 1 ("id": 1)**: Watches Uniswap V3 trades from an extremely large and active MEV Bot. In order to look at Uniswap V3 trades specifically, the code filters on the first value (```topic0```) in the ```raw_log_topics``` array with the Uniswap V3 Swap event hash. Tracking trades from this wallet can provide signal about arbitrage or trading opportunities. 
+#### Example 1 ("id": 1):
+Purpose: Monitors large-scale trades on Uniswap V3 by a highly active MEV Bot.
+Details: Filters based on the topic0 in raw_log_topics array matching the Uniswap V3 Swap event hash. Observing this wallet's trades can offer insights into arbitrage or trading windows.
 
+#### Example 2 ("id": 2):
+Purpose: Observes Aave Liquidation events for a wallet holding a WETH Debt of $10M.
+Details: Filters by the topic0 in raw_log_topics array that corresponds to the Aave Liquidation event hash. Monitoring significant liquidations from this wallet might hint at potential risks in lending platforms, increased selling pressure on the liquidated collateral, or potential cascading liquidation events.
 
-**Example 2 ("id": 2)**: Watches Aave Liquidation events from a wallet with $10Ms in WETH Debt. In order to look at Aave Liquidations specifically, the code filters on the first value (```topic0```) in the ```raw_log_topics``` array with the Aave Liquidation event hash. Tracking large liquidations from this wallet can provide signal about possible risks in lending markets, downward selling pressure on liquidated collateral and/or cascading liquidation events.
+#### Example 3 ("id": 3):
+Purpose: Tracks $CQT Transfers from the wallet implicated in the Nomad Bridge hack.
+Details: Filters transactions using topic0 in the raw_log_topics array matching the universal Transfer event hash. Observing this wallet's movements is vital for investors, given its possession of a sizable chunk of the circulating supply. Any substantial sale of tokens by this wallet could dramatically influence the token's market value.
 
-**Example 3 ("id": 3)**: Watches $CQT Transfers from the wallet that hacked the [Nomad Bridge](https://www.theverge.com/2022/8/2/23288785/nomad-bridge-200-million-chaotic-hack-smart-contract-cryptocurrency). In order to look at Transfers specifically, the code filters on the first value (```topic0```) in the ```raw_log_topics``` array with the universal Transfer event hash. Tracking when this wallet moves $CQT - or any other token - is extremely important for investors as it holds a large amount of the circulating supply. If this wallet was to sell all its tokens on the open market, it could have drastic effects on the token's price.
 
 
 
