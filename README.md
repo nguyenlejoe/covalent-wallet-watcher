@@ -140,19 +140,19 @@ http://localhost:3000/api/wallets/transactions
 The config.ts file houses several practical examples to guide you in crafting alerts. Here’s a summary of each:
 
 ### Example 1 ("id": 1):
-**Purpose:** Monitors large-scale trades on Uniswap V3 by a highly active MEV Bot.
+**Purpose:** Monitors trades on Uniswap V3 by a highly active and extremely large MEV Bot.
 
-Details: Filters based on the topic0 in raw_log_topics array matching the Uniswap V3 Swap event hash. Observing this wallet's trades can offer insights into arbitrage or trading windows.
+**Details:** Filters based on the ```topic0``` field in ```raw_log_topics``` array matching the Uniswap V3 Swap event hash. Observing this wallet's trades can offer insights into arbitrage or trading opportunities.
 
 ### Example 2 ("id": 2):
-**Purpose:** Observes Aave Liquidation events for a wallet holding a WETH Debt of $10M.
+**Purpose:** Observes Aave Liquidation events for a wallet holding $10Ms in WETH Debt.
 
-**Details:** Filters by the topic0 in raw_log_topics array that corresponds to the Aave Liquidation event hash. Monitoring significant liquidations from this wallet might hint at potential risks in lending platforms, increased selling pressure on the liquidated collateral, or potential cascading liquidation events.
+**Details:** Filters based on the ```topic0``` field in ```raw_log_topics``` array matching the Aave Liquidation event hash. Monitoring significant liquidations from this wallet might hint at potential risks in lending platforms, increased selling pressure on the liquidated collateral, or potential cascading liquidation events.
 
 ### Example 3 ("id": 3):
-**Purpose:** Tracks $CQT Transfers from the wallet implicated in the Nomad Bridge hack.
+**Purpose:** Tracks $CQT Transfers from the wallet implicated in the [Nomad Bridge](https://www.theverge.com/2022/8/2/23288785/nomad-bridge-200-million-chaotic-hack-smart-contract-cryptocurrency) hack.
 
-**Details:** Filters transactions using topic0 in the raw_log_topics array matching the universal Transfer event hash. Observing this wallet's movements is vital for investors, given its possession of a sizable chunk of the circulating supply. Any substantial sale of tokens by this wallet could dramatically influence the token's market value.
+**Details:** Filters transactions using ```topic0``` in the ```raw_log_topics``` array matching the universal Transfer event hash. Observing this wallet's movements is vital for investors, given its possession of a sizable chunk of the circulating supply. Any substantial sale of tokens by this wallet could dramatically influence the token's market value.
 
 
 
