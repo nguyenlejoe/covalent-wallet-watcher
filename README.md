@@ -139,10 +139,8 @@ http://localhost:3000/api/wallets/transactions
 ## Examples
 There are numerous examples in the config.ts file of the project that can get you started with building alerts. Here's a breakdown of what each example does:
 
-**Example 1 ("id": 1)**: Watches Uniswap V3 trades from an extremely large and active MEV Bot (```0xA69BABEF1CA67A37FFAF7A485DFFF3382056E78C```). In order to look at Uniswap V3 trades specifically, the code filters on the first value (```topic0```) in the ```raw_log_topics``` array with the Uniswap V3 Swap event. Tracking trades from this wallet can provide signal about arbitrage or trading opportunities. 
-```
-0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67 = Uniswap V3 Swap Event
-```
+**Example 1 ("id": 1)**: Watches Uniswap V3 trades from an extremely large and active MEV Bot. In order to look at Uniswap V3 trades specifically, the code filters on the first value (```topic0```) in the ```raw_log_topics``` array with the Uniswap V3 Swap event. Tracking trades from this wallet can provide signal about arbitrage or trading opportunities. 
+
 
 **Example 2 ("id": 2)**: Watches Aave Liquidation events from a wallet with $10Ms in WETH Debt (```0x01d1f55d94a53a9517c07f793f35320FAA0D2DCf```). In order to look at Aave Liquidations specifically, the code filters on the first value (```topic0```) in the ```raw_log_topics``` array with the Aave liquidation event (```0xe413a321e8681d831f4dbccbca790d2952b56f977908e45be37335533e005286```). Tracking when this wallet gets liquidated can provide signal about risks in lending markets, downward selling pressure on liquidated collateral and/or the possibly of a cascading liquidation event.
 
