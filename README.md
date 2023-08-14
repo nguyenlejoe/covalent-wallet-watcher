@@ -62,21 +62,56 @@ yarn run dev
 
 ## Configuring your project
 
-In the `config.ts` file, you can define an array of alerts. Each alert can have multiple addresses to watch for a specific case. Each alert also has a `filter` function field where you can add your own logic. This function takes in a transaction object response and determines if it matches the desired criteria.
+In the `config.ts` file, you can define an array of alerts. Each alert can have multiple addresses to watch for a specific case. Each alert also has a `filter` function field where you can add your own logic. This function takes in the api response object and determines if it matches the desired criteria.
 
-1. Configure Alerts: Edit the `config.ts` file to define your alerts. Each alert should include the addresses and chain name to watch and the filter function that determines the matching criteria.
+1. Configure payload: Edit the `config.ts` file to define your alerts. Each alert should have a `payload` that includes the addresses and chain name to watch
 
-2. Choosing either telegram and or mailgun: the `active` field is to disable or enable messaging for each alert
+```
+  "payload" : [
+    {
+      address: "0xA69BABEF1CA67A37FFAF7A485DFFF3382056E78C", // MEV Bot
+      chainName: "eth-mainnet"
+    }
+  ],
+```
 
-3. Define Cron Time: Open the `vercel.json` file and set the cron time. The example is set to run every day, but you can adjust it according to your requirements.
+2. Choosing type of endpoint: The type of endpoint your alert calls should be within the `endpoint enum` type
+```
+ "endpoint": endpoint.transactions_v3,
+```
+ the `endpoint enum` could be  
+ - transactions_v3
+ - transactions_v2
+ - balances_v2
+
+3. Adjusting your filter function: The filter function takes in the api response object your alert calls. You can adjust the filter criteria to your liking and customize the message in this function.
+
+```
+ "filter": (data: any): ping => {
+      let ping = {
+          ping: false,
+          message: "Successful ping",
+          subject: "New activity alert"
+      }
+
+      if(data.successful){
+         ping.ping = true
+      }
+      return ping;
+ }
+```
+
+4.   Choosing either telegram and or mailgun: the `active` field is to disable or enable messaging for each alert
+
+5. Define Cron Time: Open the `vercel.json` file and set the cron time. The example is set to run every day, but you can adjust it according to your requirements.
 
 ```
 "schedule": "0 0 * * *"
 ```
 
-4. Deploy Project: Push your changes to the main branch and deploy the project using the Vercel platform.
+6. Deploy Project: Push your changes to the main branch and deploy the project using the Vercel platform.
 
-5. Enable Cron Job: Go to your project settings in Vercel and locate the option to enable the cron job. Turn it on to start the scheduled processing based on the defined cron time.
+7. Enable Cron Job: Go to your project settings in Vercel and locate the option to enable the cron job. Turn it on to start the scheduled processing based on the defined cron time.
 
 Start adding alerts and address you would like to watch and add filters and functions to send messages to your telegram bot / email
 
