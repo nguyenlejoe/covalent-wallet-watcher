@@ -2,8 +2,8 @@
   "buildCommand": "pnpm turbo build",
   "crons": [
     {
-      "path": "/api/wallets/transactions",
-      "schedule": "*/5 * * * *"
+      "path": "/api/wallets/alerts",
+      "schedule": "0 0 * * *"
     }
   ]
 }

@@ -121,7 +121,7 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
                 // Filter function for transaction
 
                 // const message = `Recent transaction alert From: ${k.from_address} To: ${k.to_address} Value: ${k.value} Time: ${k.block_signed_at}`;
-                const ping = i.filter(k);
+                const ping = i.filter({...k, ...{alert_name: i.name}});
                 if(!cron_ping){
                     cron_ping = ping;
                 }
