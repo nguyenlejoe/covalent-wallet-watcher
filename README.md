@@ -64,7 +64,7 @@ yarn run dev
 
 In the `config.ts` file, you can define an array of alerts. Each alert can have multiple addresses to watch for a specific case. Each alert also has a `filter` function field where you can add your own logic. This function takes in a transaction object response and determines if it matches the desired criteria.
 
-1. Configure Alerts: Edit the `config.ts` file to define your alerts. Each alert should include the addresses to watch and the filter function that determines the matching criteria.
+1. Configure Alerts: Edit the `config.ts` file to define your alerts. Each alert should include the addresses and chain name to watch and the filter function that determines the matching criteria.
 
 2. Choosing either telegram and or mailgun: the `active` field is to disable or enable messaging for each alert
 
@@ -83,56 +83,67 @@ Start adding alerts and address you would like to watch and add filters and func
 
 
 ```
-export const config = {
-  "alerts": [
-    {
+ {
         "id": 1,
-        "name": "first alert",
-        "addresses" : [
-            "0x9507c04B10486547584C37bCBd931B2a4FeE9A41"
+        "name": "Uniswap Trade Alert: Large MEV Bot",
+        "endpoint": endpoint.transactions_v3,
+        "payload" : [
+          {
+            address: "0xA69BABEF1CA67A37FFAF7A485DFFF3382056E78C", // MEV Bot
+            chainName: "eth-mainnet"
+          }
         ],
         "email": {
-          "active": true,
-          "to": ["test.com"],
-          "subject": "New activity alert"
-        },
-        "telegram": {
-          "active" : true
-        },
-        "message": "Jump Trading Activity",
-        "filter": (data: any) => {
-            const to_filter = "0x9507c04B10486547584C37bCBd931B2a4FeE9A41";
+            "active": true,
+            "to": ["test@email.com"]
+          },
+          "telegram": {
+            "active" : true
+          },
+        "filter": (data: any): ping => {
+            const to_filter = "0xA69BABEF1CA67A37FFAF7A485DFFF3382056E78C";
             const raw_log_topics_filter_1 = "0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67"
-            const raw_log_topics_filter_2 = "0x0000000000000000000000009507c04B10486547584C37bCBd931B2a4FeE9A41"
-            let ping = false;
-
-            if(!data.successful){
-              return ping
+            const raw_log_topics_filter_2 = "0x000000000000000000000000A69BABEF1CA67A37FFAF7A485DFFF3382056E78C"
+            let ping = {
+                ping: false,
+                message: "Uniswap Swap Event",
+                subject: "New activity alert"
             }
 
             if(data.to_address !== to_filter.toLowerCase()){
               return ping;
             }
 
+            if(!data.successful){
+                return ping
+            }
+
             for(const i of data.log_events){
                 if(i.raw_log_topics[0] === raw_log_topics_filter_1.toLowerCase()){
                     if(i.raw_log_topics[2] === raw_log_topics_filter_2.toLowerCase()){
-                        ping = true;
+                        ping.ping = true;
                         break;
                     }
                 }
             }
 
+            // Message and subject can be edited and customized
+
+            ping.message = `${data.alert_name}: 
+            
+            Uniswap Swap Event
+
+            transaction was ${data.successful && "successful"}
+            `
+
             return ping;
         }
-    }
-  ]
-}
+    }, 
 ```
 
 Try running the cron endpoint locally to see results.
 ```
-http://localhost:3000/api/wallets/transactions
+http://localhost:3000/api/wallets/alerts
 ```
 
 
