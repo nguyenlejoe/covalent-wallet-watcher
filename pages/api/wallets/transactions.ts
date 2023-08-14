@@ -89,8 +89,8 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
         const db_recent = new Date(db.latest_transaction.rows[0].created_at);
 
         // Get latest transactions of addresses in the alert
-        const results = await Promise.all(i.addresses.map(async (o,i) => {
-            const resp =  fetch(`https://api.covalenthq.com/v1/eth-mainnet/address/${o}/transactions_v3/`, {
+        const results = await Promise.all(i.payload.map(async (o,index) => {
+            const resp =  fetch(`https://api.covalenthq.com/v1/${o.chainName}/address/${o.address}/${i.endpoint}/`, {
                 method: "GET",
                 headers: headers
             }).then(resp => resp.json())
@@ -99,14 +99,13 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
             return [...transactions.data.items]
         }))
         .catch(async function(err) {
-            console.log(err)
             await handleTelegramMessage(err.message);
         });
 
         if(!results){
             return res.status(500).json({ 
                 error: true,
-                results: "noen"
+                results: "none"
             });
         }
 
@@ -126,12 +125,12 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
                 if(!cron_ping){
                     cron_ping = ping;
                 }
-                if(ping){
+                if(ping.ping){
                     if(i.telegram.active){
-                        await handleTelegramMessage(i.message);
+                        await handleTelegramMessage(ping.message);
                     }
                     if(i.email.active){
-                        await handleEmail(i.email.to, i.message, i.email.subject);
+                        await handleEmail(i.email.to, ping.message, ping.message.subject);
                     }
                 }
             }
