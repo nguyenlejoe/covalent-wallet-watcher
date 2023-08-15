@@ -116,7 +116,7 @@ Start adding alerts and address you would like to watch and add filters and func
 
 
 ```
- {
+    {
         "id": 1,
         "name": "Uniswap Trade Alert: Large MEV Bot",
         "endpoint": endpoint.transactions_v3,
@@ -162,13 +162,8 @@ Start adding alerts and address you would like to watch and add filters and func
 
             // Message and subject can be edited and customized
 
-            ping.message = `${data.alert_name}: 
-            
-            Uniswap Swap Event
-
-            transaction was ${data.successful && "successful"}
-            `
-
+            ping.message = `${data.alert_name}:\n\nUniswap Swap Event\n\nTransaction was ${data.successful ? "successful" : ""}`;
+                     
             return ping;
         }
     }, 
