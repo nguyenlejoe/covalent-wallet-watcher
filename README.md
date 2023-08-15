@@ -20,6 +20,8 @@ Note down the generated API key.
 
 4. When filling telegram or mailgun environment vairables, fill the input with `""` if you choose not to use it.
 
+5. Click the deploy button below and fill the necessary env variables
+
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fnguyenlejoe%2Fcovalent-wallet-watcher&env=API_KEY,TELEGRAM_CHAT_ID,TELEGRAM_BOT_ID,MAILGUN_KEY,MAILGUN_DOMAIN&stores=%5B%7B%22type%22%3A%22postgres%22%7D%5D)
 
 ```
@@ -32,10 +34,6 @@ MAILGUN_DOMAIN=<your_mailgun_domain>
 
 
 ## How to run the application
-
-```
-git clone <repo>
-```
 
 1. Install dependencies.
 ```
