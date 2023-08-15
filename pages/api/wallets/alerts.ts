@@ -121,16 +121,16 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
                 // Filter function for transaction
 
                 // const message = `Recent transaction alert From: ${k.from_address} To: ${k.to_address} Value: ${k.value} Time: ${k.block_signed_at}`;
-                const ping = i.filter({...k, ...{alert_name: i.name}});
+                const alert = i.filter({...k, ...{alert_name: i.name}});
                 if(!cron_ping){
-                    cron_ping = ping;
+                    cron_ping = alert.ping;
                 }
-                if(ping.ping){
+                if(alert.ping){
                     if(i.telegram.active){
-                        await handleTelegramMessage(ping.message);
+                        await handleTelegramMessage(alert.message);
                     }
                     if(i.email.active){
-                        await handleEmail(i.email.to, ping.message, ping.message.subject);
+                        await handleEmail(i.email.to, alert.message, alert.message.subject);
                     }
                 }
             }

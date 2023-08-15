@@ -49,13 +49,8 @@ export const config: Iconfig = {
 
             // Message and subject can be edited and customized
 
-            ping.message = `${data.alert_name}: 
-            
-            Uniswap Swap Event
-
-            transaction was ${data.successful && "successful"}
-            `
-
+            ping.message = `${data.alert_name}:\n\nUniswap Swap Event\n\nTransaction was ${data.successful ? "successful" : ""}`;
+                     
             return ping;
         }
     }, 
