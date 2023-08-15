@@ -89,16 +89,18 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
         const db_recent = new Date(db.latest_transaction.rows[0].created_at);
 
         // Get latest transactions of addresses in the alert
-        const results = await Promise.all(i.payload.map(async (o,index) => {
+        const results = await Promise.all(i.payload.map(async (o) => {
+            
             const resp =  fetch(`https://api.covalenthq.com/v1/${o.chainName}/address/${o.address}/${i.endpoint}/`, {
                 method: "GET",
                 headers: headers
             }).then(resp => resp.json())
-
             const transactions = await resp;
             return [...transactions.data.items]
+
         }))
         .catch(async function(err) {
+            console.log(err)
             await handleTelegramMessage(err.message);
         });
 
@@ -120,7 +122,6 @@ export default async function transactions(req:NextApiRequest, res:NextApiRespon
             if(new Date(k.block_signed_at) > db_recent){
                 // Filter function for transaction
 
-                // const message = `Recent transaction alert From: ${k.from_address} To: ${k.to_address} Value: ${k.value} Time: ${k.block_signed_at}`;
                 const alert = i.filter({...k, ...{alert_name: i.name}});
                 if(!cron_ping){
                     cron_ping = alert.ping;
